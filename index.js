@@ -1,0 +1,4 @@
+/*
+ * Demo index
+ */
+require('./lib');
