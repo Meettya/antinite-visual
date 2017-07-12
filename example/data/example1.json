@@ -1,0 +1,102 @@
+[
+  {
+    "name": "services",
+    "isReady": true,
+    "services": [
+      {
+        "name": "HttpConnector",
+        "isReady": true,
+        "acl": 777,
+        "export": {
+          "getStatus": "read",
+          "sendData": "write",
+          "open": "execute",
+          "close": "execute"
+        },
+        "require": [
+          {
+            "name": "Logger",
+            "actions": {
+              "log": {
+                "isReady": true,
+                "resolved": "shared"
+              }
+            }
+          },
+          {
+            "name": "ConfigReader",
+            "actions": {
+              "read": {
+                "isReady": true,
+                "resolved": "shared"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "shared",
+    "isReady": true,
+    "services": [
+      {
+        "name": "ConfigReader",
+        "isReady": true,
+        "acl": 751,
+        "export": {
+          "read": "execute",
+          "getStatus": "read"
+        },
+        "require": [
+          {
+            "name": "Logger",
+            "actions": {
+              "log": {
+                "isReady": true,
+                "resolved": "shared"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Logger",
+        "isReady": true,
+        "acl": 762,
+        "export": {
+          "log": "write"
+        },
+        "require": []
+      }
+    ]
+  },
+  {
+    "name": "system",
+    "isReady": true,
+    "services": [
+      {
+        "name": "Auditor",
+        "isReady": true,
+        "acl": 744,
+        "export": {
+          "getData": "read",
+          "startAudit": "execute",
+          "stopAudit": "execute"
+        },
+        "require": []
+      },
+      {
+        "name": "Debugger",
+        "isReady": true,
+        "acl": 744,
+        "export": {
+          "getData": "read",
+          "startDebug": "execute",
+          "stopDebug": "execute"
+        },
+        "require": []
+      }
+    ]
+  }
+]

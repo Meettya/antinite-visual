@@ -1,4 +1,0 @@
-/*
- * Demo index
- */
-require('./lib');

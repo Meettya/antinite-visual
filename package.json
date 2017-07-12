@@ -2,15 +2,19 @@
   "name": "antinite-visual",
   "version": "1.0.0",
   "description": "Antinit visualisation demo",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "./node_modules/.bin/babel src --out-dir lib"
+    "build_browser": "WEBPACK_ENV=build webpack",
+    "dev_browser": "WEBPACK_ENV=dev webpack --progress --colors",
+    "start_server": "node ./example/server.js"
   },
   "author": "",
   "license": "ISC",
   "standard": {
-    "globals": [ "vis", "TinyData" ],
+    "globals": [
+      "vis",
+      "TinyData"
+    ],
     "parser": "babel-eslint"
   },
   "devDependencies": {
@@ -19,6 +23,7 @@
     "babel-eslint": "^7.2.3",
     "babel-fast-presets": "0.0.2",
     "babel-loader": "^7.1.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-stage-0": "^6.5.0",
     "express": "*",
@@ -26,5 +31,8 @@
     "standard": "^10.0.2",
     "webpack": "^3.0.0",
     "webpack-dev-middleware": "^1.11.0"
+  },
+  "dependencies": {
+    "tiny-data": "^0.8.1"
   }
 }

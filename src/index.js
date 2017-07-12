@@ -1,25 +1,133 @@
 /*
- * express demo server
+ * Main point of Antinit visualisator
  */
-const express = require('express')
-const app = express()
-const webpack = require('webpack')
+import TinyData from 'tiny-data'
+import GlobalDiagram from './global_diagram'
+import DetailLayerGraph from './detail_layer_graph'
+import DetailServiceGraph from './detail_service_graph'
 
-const webpackConfig = require('../webpack.config.js')
-const compiler = webpack(webpackConfig)
+class AntinitVisualiser {
+  constructor (mountPoint, dataIn) {
+    this.mountPoint = mountPoint
+    this.dataIn = dataIn
+    this.tinyDataObj = new TinyData(dataIn, {debug: false}) // debug for develop
+    this.globalDiagram = new GlobalDiagram()
+    this.detailPoint = null
+    this.detailGraph = null
+    this.globalClickHandler = this.globalClickHandler.bind(this)
+  }
 
-app.set('view engine', 'pug')
-app.use('/public', express.static('public'))
-app.use('/data', express.static('data'))
+  doDraw () {
+    let { globalPoint, detailPoint } = this.buildSubMointPoints()
 
-app.use(require('webpack-dev-middleware')(compiler, {
-  noInfo: true, publicPath: webpackConfig.output.publicPath
-}))
+    this.detailPoint = detailPoint
+    this.doDrawGlobal(globalPoint)
+  }
 
-app.get('/', function (req, res) {
-  res.render('index', { title: 'Antinit visual demo', message: 'Simply graph example' })
-})
+  doDrawGlobal (mountPoint) {
+    this.globalDiagram.setMountPoint(mountPoint)
+      .setData(this.dataIn)
+      .setClickHandler(this.globalClickHandler)
+      .doDraw()
+  }
 
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!')
-})
+  buildSubMointPoints () {
+    let globalPoint = document.createElement('div')
+    let detailPoint = document.createElement('div')
+
+    globalPoint.setAttribute('style', 'width:69%; border: 1px solid #FF7F50; float: left; min-height: 100%;')
+    detailPoint.setAttribute('style', 'width:29%; border: 1px solid #FF7F50; float: left; min-height: 100%;')
+
+    this.mountPoint.appendChild(globalPoint)
+    this.mountPoint.appendChild(detailPoint)
+
+    return { globalPoint, detailPoint }
+  }
+
+  globalClickHandler (node) {
+    let layerIdx, serviceIdx
+
+    if (!node) {
+      this.doClearDetail()
+    } else {
+      [layerIdx, serviceIdx] = this.getServicePath(node)
+      if (serviceIdx) {
+        this.doShowDetailService(layerIdx, serviceIdx)
+      } else {
+        this.doShowDetailLayer(layerIdx)
+      }
+    }
+  }
+
+  /*
+   * Detect - is it service
+   *
+   * not formaly - by 'dot' in name, but compared to data
+   */
+  getServicePath (node) {
+    let layerPath, servicePath, layerName, serviceName, layerRes, serviceRes, layerIdx, serviceIdx
+
+    // just protection
+    if (!node) {
+      return []
+    }
+
+    [layerName, serviceName] = node.split('.', 2)
+
+    layerPath = `^(\\d+)\\.name\\.(${layerName})`
+    servicePath = `^(\\d+)\\.services\\.(\\d+)\\.name\\.${serviceName}`
+
+    layerRes = this.tinyDataObj.seekOutVerso(layerPath)
+    serviceRes = this.tinyDataObj.seekOut(servicePath)
+
+    layerIdx = layerRes[layerName]
+    serviceIdx = serviceRes[layerIdx]
+
+    // HACK - transform two Arrays in one Array
+    return layerIdx.concat(serviceIdx)
+  }
+
+  doClearDetail () {
+    if (this.detailGraph !== null) {
+      this.detailGraph.destroy()
+      this.detailGraph = null
+    }
+  }
+
+  doShowDetailLayer (layerIdx) {
+    // do not rewrite on some data
+    if (this.getCurrentDetail() === layerIdx) {
+      return
+    }
+
+    this.doClearDetail()
+
+    this.detailGraph = new DetailLayerGraph(layerIdx)
+
+    this.detailGraph.setMountPoint(this.detailPoint)
+      .setData(this.dataIn)
+      .doDraw()
+  }
+
+  doShowDetailService (layerIdx, serviceIdx) {
+    // do not rewrite on some data
+    if (this.getCurrentDetail() === `${layerIdx}.${serviceIdx}`) {
+      return
+    }
+    this.doClearDetail()
+
+    this.detailGraph = new DetailServiceGraph(`${layerIdx}.${serviceIdx}`)
+
+    this.detailGraph.setMountPoint(this.detailPoint)
+      .setData(this.dataIn)
+      .doDraw()
+  }
+
+  getCurrentDetail () {
+    if (this.detailGraph !== null) {
+      return this.detailGraph.getName()
+    }
+  }
+}
+
+export default AntinitVisualiser

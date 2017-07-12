@@ -1,6 +1,7 @@
 /*
  * Detail Layer graph
  */
+import TinyData from 'tiny-data'
 import options from './options'
 import BaseRender from './base_render'
 

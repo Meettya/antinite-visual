@@ -1,0 +1,8 @@
+<html><head><title>Antinit visual demo</title><script src="/public/vis-4.20.0.min.js"></script><script src="/js/antinite-visual.min.js"></script></head><body><h1>Project graph demo</h1><div id="mountPoint" style="height:90%;"></div><script>var container = document.getElementById('mountPoint');
+var drawExample = function(dataIn) {
+  new AntiniteVisualToolkit(container, dataIn).doDraw();
+};
+
+fetch('/data/example1.json')
+  .then(function (response){ return response.json();})
+  .then(drawExample)</script></body></html>

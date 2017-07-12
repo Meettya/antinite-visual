@@ -1,0 +1,15 @@
+html
+  include includes/head.pug
+  body
+    h1 Project graph demo
+    #mountPoint(style={height: '90%'})
+
+    script.
+      var container = document.getElementById('mountPoint');
+      var drawExample = function(dataIn) {
+        new AntiniteVisualToolkit(container, dataIn).doDraw();
+      };
+
+      fetch('/data/example1.json')
+        .then(function (response){ return response.json();})
+        .then(drawExample)
