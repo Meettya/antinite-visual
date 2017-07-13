@@ -4,7 +4,11 @@ See [online](https://meettya.github.io/antinite-visual/index.html) example.
 
 ## Description:
 
-This is visualisation tool for [antinit](https://github.com/Meettya/antinite)-powered project data.
+This is browser visualisation tool for [antinit](https://github.com/Meettya/antinite)-powered project data.
+
+## Dependencies:
+
+Require [vis](http://visjs.org/).
 
 ## Usage:
 
