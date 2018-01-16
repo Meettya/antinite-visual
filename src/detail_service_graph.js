@@ -49,6 +49,8 @@ class DetailServiceGraph extends BaseRender {
     let exportObj = currentService.export
     let nodes = []
     let edges = []
+    let consumersDict = {}
+    let consumersServiceDict = {}
 
     nodes.push({
       id: exportName,
@@ -83,29 +85,36 @@ class DetailServiceGraph extends BaseRender {
         let consumerLayerId = `export.${consumerLayer}`
         let layerServices = consumers[consumerLayer]
 
-        nodes.push({
-          id: consumerLayerId,
-          label: consumerLayer,
-          group: 'layer_other',
-          level: 0
-        })
+        if (!consumersDict[consumerLayerId]) {
+          nodes.push({
+            id: consumerLayerId,
+            label: consumerLayer,
+            group: 'layer_other',
+            level: 0
+          })
+          consumersDict[consumerLayerId] = true
+        }
+
         layerServices.forEach((service) => {
           let consumerServiceId = `${consumerLayerId}.${service}`
 
-          nodes.push({
-            id: consumerServiceId,
-            label: service,
-            group: 'service_other',
-            level: 1
-          })
+          if (!consumersServiceDict[consumerServiceId]) {
+            nodes.push({
+              id: consumerServiceId,
+              label: service,
+              group: 'service_other',
+              level: 1
+            })
+            edges.push({
+              from: consumerServiceId,
+              to: consumerLayerId
+            })
+            consumersServiceDict[consumerServiceId] = true
+          }
           edges.push({
             from: consumerServiceId,
-            to: consumerLayerId
-          },
-            {
-              from: consumerServiceId,
-              to: actionId
-            })
+            to: actionId
+          })
         })
       })
     }, this)
